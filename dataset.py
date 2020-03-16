@@ -25,15 +25,23 @@ class TemporalData(Dataset):
         return torch.from_numpy(data), torch.from_numpy(np.array(label)), torch.from_numpy(data[:, 4:])
 
 class TemporalDataFold(Dataset):
-    def __init__(self, split='train', root='/home/zhangruiwen/01research/02toyota/03code/mywork/data'):
-        self.fpath = os.path.join(root, split+'_txt')
-        self.filelist = os.listdir(self.fpath)
+    def __init__(self, split='train', K_k=(3,0), root='/home/zhangruiwen/01research/02toyota/03code/mywork/data/'):
+        if split=='test':
+            self.fpath = os.path.join(root, f'{K_k[0]}-fold/{K_k[1]}')
+            self.filelist = [os.path.join(self.fpath, f) for f in os.listdir(self.fpath)]
+        else:
+            self.filelist = []
+            for k in range(K_k[0]):
+                if k != K_k[1]:
+                    self.fpath = os.path.join(root, f'{K_k[0]}-fold/{k}')
+                    self.filelist += [os.path.join(self.fpath, f) for f in os.listdir(self.fpath)]
 
     def __len__(self):
         return len(self.filelist)
 
     def __getitem__(self, index):
-        idata = np.loadtxt(os.path.join(self.fpath, self.filelist[index]), dtype=np.float32)
+        # idata = np.loadtxt(os.path.join(self.fpath, self.filelist[index]), dtype=np.float32)
+        idata = np.loadtxt(self.filelist[index], dtype=np.float32)
         ind = np.random.randint(idata.shape[0]-23)
         
         data = np.array([idata[ind:ind+24, 1]])
@@ -46,6 +54,7 @@ class TemporalDataFold(Dataset):
 
 
 if __name__ == '__main__':
-    train_dataloader = DataLoader(TemporalData(split='train'), batch_size=1, shuffle=True, num_workers=4)
-    for inputs, labels in train_dataloader:
-        print(labels, inputs.size())
+    train_dataloader = DataLoader(TemporalDataFold(split='train'), batch_size=1, shuffle=True, num_workers=4)
+    print(len(TemporalDataFold(split='test')))
+    # for inputs, labels, l in train_dataloader:
+    #     print(labels, inputs.size())

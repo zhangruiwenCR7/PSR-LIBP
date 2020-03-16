@@ -9,7 +9,7 @@ n = sys.argv[1]
 train_loss, train_acc = [], []
 val_loss, val_acc = [], []
 test_loss, test_acc = [], []
-with open('log'+n) as f:
+with open('log/log'+n) as f:
     for line in f.readlines():
         line = line.strip().split()
         # print(line)
@@ -29,7 +29,7 @@ plt.figure(figsize=(20,10))
 
 plt.subplots_adjust(left=0.05, right=0.95, top=0.9, bottom=0.1)
 
-plt.title('LSTM loss&acc')
+plt.title('Phase Space Loss&Acc')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.xlim([0,3000])
